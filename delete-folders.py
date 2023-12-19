@@ -28,14 +28,14 @@ def send_to_telegram(api_token, chat_id, message):
 print("Searching for empty folders...")
 
 # Check if the required command line arguments are provided
-if len(sys.argv) != 4:
-    print("Error: Please provide the search path, API token, and chat ID as command line arguments.")
+if len(sys.argv) < 2:
+    print("Error: Please provide at least the search path as a command line argument.")
     sys.exit(1)
 
 # Get command line arguments
 search_path = sys.argv[1]
-api_token = sys.argv[2]
-chat_id = sys.argv[3]
+api_token = sys.argv[2] if len(sys.argv) > 2 else None
+chat_id = sys.argv[3] if len(sys.argv) > 3 else None
 
 # Check if the provided path exists
 if os.path.isdir(search_path):
@@ -45,18 +45,19 @@ if os.path.isdir(search_path):
     # Check if any folders were deleted
     if deleted_folders:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        log_filename = f"deleted_on_{timestamp}.txt"
+        log_filename = f"deleteme_{timestamp}.txt"
         with open(log_filename, 'w') as log_file:
             for folder in deleted_folders:
                 log_file.write(folder + '\n')
 
-        # Send a notification to Telegram
-        event_name = 'Deleted folders'
-        message = f"{event_name}:\n\n"
-        for folder in deleted_folders:
-            message += f"- {folder}\n"
+        # Send a notification to Telegram if both API token and chat ID are provided
+        if api_token and chat_id:
+            event_name = 'Deleted folders'
+            message = f"{event_name}:\n\n"
+            for folder in deleted_folders:
+                message += f"- {folder}\n"
 
-        send_to_telegram(api_token, chat_id, message)
+            send_to_telegram(api_token, chat_id, message)
 
         print(f"Empty folders deleted successfully. Deleted folders listed in {log_filename}.")
     else:
