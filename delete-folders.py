@@ -45,7 +45,7 @@ if os.path.isdir(search_path):
     # Check if any folders were deleted
     if deleted_folders:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        log_filename = f"deleteme_{timestamp}.txt"
+        log_filename = f"deleted_on_{timestamp}.txt"
         with open(log_filename, 'w') as log_file:
             for folder in deleted_folders:
                 log_file.write(folder + '\n')
